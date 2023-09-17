@@ -13,15 +13,16 @@ router.post('/make-payment',authMiddleware,async(req,res)=>{
             email:token.email,
             source:token.id
         })
-        const charge = await stripe.charges.create({
-            amount:amount,
-            currency:"usd",
-            customer:customer.id,
-            receipt_email:token.email,
-            description:"Ticket has been booked for a movie"
-        })
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount,
+          currency: 'usd',
+          customer: customer.id,
+          payment_method_types: ['card'],
+          receipt_email: token.email,
+          description: "Token has been assigned to the movie!"
+        });
 
-        const transactionId = charge.id;
+      const transactionId = paymentIntent.id;
         res.send({
             success:true,
             message:"Payment done, Ticket booked",
